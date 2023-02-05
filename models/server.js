@@ -1,5 +1,5 @@
 const express = require('express');
-const { productRouter } = require('../routes/produc.routes');
+const { productRouter } = require('../routes/product.routes');
 const cors = require('cors');
 const { db } = require('../dataBase/db');
 const morgan = require('morgan');

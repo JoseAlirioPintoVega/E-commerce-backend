@@ -32,23 +32,7 @@ const findUsers = async (req, res) => {
 const findUser = async (req, res) => {
   try {
     // 1. OBTENER EL ID DE LOS PARAMETROS
-    const { id } = req.params;
-
-    // 2. BUSCAR AL USUARIO CON EL ID QUE VENIA DE LOS PARAMETROS, Y QUE EL STATUS SEA TRUE
-    const user = await User.findOne({
-      where: {
-        status: true,
-        id,
-      },
-    });
-
-    // 3. SI NO EXISTE EL USUARIO ENVIAR UNA RESPUESTA DE ERROR
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found',
-      });
-    }
+    const { user } = req;
 
     // 4. ENVIAR UNA RESPUESTA AL USUARIO
     res.status(200).json({
@@ -67,49 +51,34 @@ const findUser = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
+    //1. OBTENER LA INFORMACION DE LA REQ.BODY
+    const { username, email, password } = req.body;
+    //2. CREAR EL USUARIO CON LA INFORMACION DE LA REQ.BODY
+    const user = await User.create({
+      username: username.toLowerCase(),
+      email: email.toLowerCase(),
+      password,
+    });
+    //3. ENVIAR UNA RESPUESTA AL USUARIO
+    res.status(201).json({
+      status: 'success',
+      message: 'User created successfully',
+      user,
+    });
   } catch (error) {
     return res.status(500).json({
       status: 'fail',
       message: 'Internal server error',
     });
   }
-  //1. OBTENER LA INFORMACION DE LA REQ.BODY
-  const { username, email, password } = req.body;
-  //2. CREAR EL USUARIO CON LA INFORMACION DE LA REQ.BODY
-  const user = await User.create({
-    username: username.toLowerCase(),
-    email: email.toLowerCase(),
-    password,
-  });
-  //3. ENVIAR UNA RESPUESTA AL USUARIO
-  res.status(201).json({
-    status: 'success',
-    message: 'User created successfully',
-    user,
-  });
 };
 
 const updateUser = async (req, res) => {
   try {
     // 1. OBTENER EL ID DE LOS PARAMETROS
-    const { id } = req.params;
+    const { user } = req;
     // 2. OBTENER LA INFORMACION A ACTUALIZAR DE LA REQ.BODY
     const { username, email } = req.body;
-
-    // 3. OBTENER UN USUARIO POR SU ID Y QUE EL STATUS SEA TRUE
-    const user = await User.findOne({
-      where: {
-        status: true,
-        id,
-      },
-    });
-    //4. SI NO EXISTE UN USUARIO ENVIAR UN ERROR
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found',
-      });
-    }
 
     // 5. REALIZAR LA ACTUALIZACIÓN DEL USUARIO, CAMPOS USERNAME, EMAIL
     await user.update({ username, email });
@@ -129,22 +98,8 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    // 1. OBTENER EL ID DE LOS PARAMETROS
-    const { id } = req.params;
-    // 2. OBTENER UN USUARIO POR SU ID Y QUE EL STATUS SEA TRUE
-    const user = await User.findOne({
-      where: {
-        status: true,
-        id,
-      },
-    });
-    //3. SI NO EXISTE UN USUARIO ENVIAR UN ERROR
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found',
-      });
-    }
+    // 1. OBTENER user ID DE LOS PARAMETROS
+    const { user } = req;
     // 4. REALIZAR LA ACTUALIZACIÓN DEL STATUS DEL USUARIO ENCONTRADO ANTERIORMENTE
     await user.update({ status: false });
     // 5. ENVIAR UNA RESPUESTA AL CLIENTE
