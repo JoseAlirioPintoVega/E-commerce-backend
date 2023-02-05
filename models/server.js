@@ -20,7 +20,6 @@ class Server {
 
     // es para llamar el metodo de conexion con la base de datos
     this.database();
-
     //
     this.middlewares();
     this.routes();
