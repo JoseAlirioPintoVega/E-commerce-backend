@@ -1,12 +1,13 @@
 const express = require('express');
-const { productRouter } = require('../routes/product.routes');
 const cors = require('cors');
-const { db } = require('../dataBase/db');
-const morgan = require('morgan');
+const { productRouter } = require('../routes/product.routes');
 const { usersRouter } = require('../routes/user.routes');
 const { categoriesRouter } = require('../routes/categories.routes');
+const { db } = require('../dataBase/db');
+const morgan = require('morgan');
 const globalErrorHandler = require('../controllers/error.controler');
 const AppError = require('../utils/appError');
+const { authRouter } = require('../routes/auth.routes');
 
 //1 creamos una clase
 
@@ -18,6 +19,7 @@ class Server {
       user: '/api/v1/user',
       products: '/api/v1/products',
       categories: '/api/v1/categories',
+      auth: '/api/v1/auth',
     };
 
     // es para llamar el metodo de conexion con la base de datos
@@ -48,12 +50,8 @@ class Server {
     // utilizar las rutas de categories
     this.app.use(this.paths.categories, categoriesRouter);
 
-    // this.app.all('*', (req, res, next) => {
-    //   res.status(404).json({
-    //     status: 'error',
-    //     message: `Can't find ${req.originalUrl} on this server`,
-    //   });
-    // });
+    this.app.use(this.paths.auth, authRouter);
+
     this.app.all('*', (req, res, next) => {
       return next(
         new AppError(`Can't find ${req.originalUrl} on this server`, 404)

@@ -1,6 +1,7 @@
 const Product = require('../models/product.model');
+const catchAsync = require('../utils/catchAsync');
 
-exports.findProduct = async (req, res) => {
+exports.findProduct = catchAsync(async (req, res, next) => {
   const products = await Product.findAll({
     where: {
       status: true,
@@ -12,9 +13,9 @@ exports.findProduct = async (req, res) => {
     message: 'The products found were successfully ',
     products,
   });
-};
+});
 
-exports.findProductById = async (req, res) => {
+exports.findProductById = catchAsync(async (req, res, next) => {
   const { product } = req;
 
   res.status(200).json({
@@ -22,9 +23,9 @@ exports.findProductById = async (req, res) => {
     message: 'The product found was successfully ',
     product,
   });
-};
+});
 
-exports.createProduct = async (req, res) => {
+exports.createProduct = catchAsync(async (req, res, next) => {
   const { title, description, quantity, price, categoryId, userId } = req.body;
 
   const newProduct = await Product.create({
@@ -41,9 +42,9 @@ exports.createProduct = async (req, res) => {
     message: 'ROUTE - POST',
     newProduct,
   });
-};
+});
 
-exports.updateProduct = async (req, res) => {
+exports.updateProduct = catchAsync(async (req, res, next) => {
   // 1.OBTENGO MI ID DEL PRODUCTO DE LA REQ.PARAMS
   const { product } = req;
   // 2 OBTENGO MI ID DE LA REQ.BODY
@@ -62,9 +63,9 @@ exports.updateProduct = async (req, res) => {
     message: 'The product haw been updated successfully',
     updatedProduct,
   });
-};
+});
 
-exports.deleteProduct = async (req, res) => {
+exports.deleteProduct = catchAsync(async (req, res, next) => {
   //1. obtenemos product del req que fue hecho en el middleware
   const { product } = req;
 
@@ -77,4 +78,4 @@ exports.deleteProduct = async (req, res) => {
     status: 'success',
     message: 'The product was deleted sucessfully',
   });
-};
+});

@@ -25,7 +25,6 @@ const User = db.define('user', {
     type: DataTypes.ENUM('user', 'admin'),
     allowNull: false,
     defaultValue: 'user',
-    enum: ['user', 'admin'],
   },
   status: {
     type: DataTypes.BOOLEAN,
