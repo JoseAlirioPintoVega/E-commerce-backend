@@ -55,6 +55,6 @@ exports.validIfExistUserEmail = catchAsync(async (req, res, next) => {
       message: 'The email user already exists',
     });
   }
-
+  req.user = user;
   next();
 });

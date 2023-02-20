@@ -7,6 +7,7 @@ const {
   deleteProduct,
   findProductById,
 } = require('../controllers/product.controller');
+const { protect, restrictTo } = require('../middlewares/aut.middleware');
 const { verifyProductById } = require('../middlewares/products.middlewares');
 
 const router = Router();
@@ -15,11 +16,13 @@ router.get('/', findProduct);
 
 router.get('/:id', verifyProductById, findProductById);
 
-router.post('/', createProduct);
+router.use(protect);
 
-router.patch('/:id', verifyProductById, updateProduct);
+router.post('/', restrictTo('admin'), createProduct);
 
-router.delete('/:id', verifyProductById, deleteProduct);
+router.patch('/:id', verifyProductById, restrictTo('admin'), updateProduct);
+
+router.delete('/:id', verifyProductById, restrictTo('admin'), deleteProduct);
 
 module.exports = {
   productRouter: router,

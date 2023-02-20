@@ -1,22 +1,22 @@
 const { DataTypes } = require('sequelize');
 const { db } = require('../dataBase/db');
 
-const Categories = db.define('categories', {
+const Cart = db.define('cart', {
   id: {
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
     type: DataTypes.INTEGER,
   },
-  name: {
-    type: DataTypes.STRING,
+  userId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   status: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    type: DataTypes.STRING,
     allowNull: false,
+    defaultValue: 'active',
   },
 });
 
-module.exports = Categories;
+module.exports = Cart;

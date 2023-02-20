@@ -1,7 +1,9 @@
 const User = require('../models/user.model');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const bcrypt = require('bcryptjs');
 
-const findUsers = catchAsync(async (req, res, next) => {
+exports.findUsers = catchAsync(async (req, res, next) => {
   // 1. BUSCAR TODOS LOS USUARIOS QUE ESTAN CON STATUS TRUE
   const users = await User.findAll({
     where: {
@@ -22,7 +24,7 @@ const findUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-const findUser = catchAsync(async (req, res, next) => {
+exports.findUser = catchAsync(async (req, res, next) => {
   // 1. OBTENER EL ID DE LOS PARAMETROS
   const { user } = req;
 
@@ -34,7 +36,7 @@ const findUser = catchAsync(async (req, res, next) => {
   });
 });
 
-const updateUser = catchAsync(async (req, res, next) => {
+exports.updateUser = catchAsync(async (req, res, next) => {
   // 1. OBTENER EL ID DE LOS PARAMETROS
   const { user } = req;
   // 2. OBTENER LA INFORMACION A ACTUALIZAR DE LA REQ.BODY
@@ -49,8 +51,32 @@ const updateUser = catchAsync(async (req, res, next) => {
     message: 'User updated successfully',
   });
 });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1. OBTENER EL ID DE LOS PARAMETROS
+  const { user } = req;
+  const { currentPassword, newPassword } = req.body;
 
-const deleteUser = catchAsync(async (req, res, next) => {
+  if (!(await bcrypt.compare(currentPassword, user.password))) {
+    return next(new AppError('Incorrect email or password', 401));
+  }
+  // aca se encripta la contraseña
+  const salt = await bcrypt.genSalt(10);
+  const encritedPassword = await bcrypt.hash(newPassword, salt);
+
+  // 5. REALIZAR LA ACTUALIZACIÓN DEL USUARIO, CAMPOS USERNAME, EMAIL
+  await user.update({
+    password: encritedPassword,
+    passwordChangedAt: new Date(),
+  });
+
+  // 6. ENVIAR UNA RESPUESTA AL CLIENTE
+  res.status(200).json({
+    status: 'success',
+    message: 'The user Password  was updated successfully',
+  });
+});
+
+exports.deleteUser = catchAsync(async (req, res, next) => {
   // 1. OBTENER user ID DE LOS PARAMETROS
   const { user } = req;
   // 4. REALIZAR LA ACTUALIZACIÓN DEL STATUS DEL USUARIO ENCONTRADO ANTERIORMENTE
@@ -61,10 +87,3 @@ const deleteUser = catchAsync(async (req, res, next) => {
     message: 'User deleted successfully',
   });
 });
-
-module.exports = {
-  findUsers,
-  findUser,
-  updateUser,
-  deleteUser,
-};

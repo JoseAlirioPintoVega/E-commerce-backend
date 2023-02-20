@@ -4,6 +4,12 @@ const handleCastError22P02 = err => {
   message = 'Some type of data sent does not match was expected ';
   return new AppError(message, 400);
 };
+const handleJWTError = () =>
+  new AppError('invalid token, please login again', 401);
+
+const handleJWTExpiredError = () =>
+  new AppError('Your token has expired! Please login again', 401);
+
 const sendErrorDev = (err, res) => {
   res.status(res.statusCode).json({
     status: err.status,
@@ -35,7 +41,16 @@ const globalErrorHandler = (err, req, res, next) => {
   }
   if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-    if (error.parent.code === '22P02') error = handleCastError22P02();
+
+    if (!err.parent?.code) {
+      error = err;
+    }
+
+    if (error.parent?.code === '22P02') error = handleCastError22P02(error);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
+    if (error.name === 'TokenExpiredError')
+      error = handleJWTExpiredError(error);
+
     sendErrorProd(error, res);
   }
 };

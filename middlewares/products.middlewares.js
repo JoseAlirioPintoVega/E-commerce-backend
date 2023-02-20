@@ -1,29 +1,60 @@
 const Product = require('../models/product.model');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 
-exports.verifyProductById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+exports.verifyProductById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
 
-    const product = await Product.findOne({
-      where: {
-        id,
-        status: true,
-      },
-    });
+  const product = await Product.findOne({
+    where: {
+      id,
+      status: true,
+    },
+  });
 
-    if (!product) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'The product was not found',
-      });
-    }
-    req.product = product;
-    next();
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Internal server error',
-    });
+  if (!product) {
+    return next(new AppError('Product not found', 404));
   }
-};
+
+  req.product = product;
+  next();
+});
+
+exports.valideBodyProductById = catchAsync(async (req, res, next) => {
+  const { productId } = req.body;
+  const product = await Product.findOne({
+    where: {
+      id: productId,
+      status: true,
+    },
+  });
+  if (!product) {
+    return next(new AppError('Product not found', 404));
+  }
+  req.product = product;
+  next();
+});
+
+exports.validIfExistProductsInStock = catchAsync(async (req, res, next) => {
+  const { product } = req;
+  const { quantity } = req.body;
+  if (product.quantity < quantity) {
+    return next(
+      new AppError('There are not enougt products in the stock', 400)
+    );
+  }
+  next();
+});
+exports.validExistProductInStockForUpdate = catchAsync(
+  async (req, res, next) => {
+    const { product } = req;
+    const { newQty } = req.body;
+
+    if (newQty > product.quantity) {
+      return next(
+        new AppError('There are not enougt products in the stock', 400)
+      );
+    }
+    next();
+  }
+);
