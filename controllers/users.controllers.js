@@ -2,6 +2,10 @@ const User = require('../models/user.model');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const bcrypt = require('bcryptjs');
+const Order = require('../models/order.models');
+const Cart = require('../models/cart.model');
+const { where } = require('sequelize');
+const ProductInCart = require('../models/productInCart.model');
 
 exports.findUsers = catchAsync(async (req, res, next) => {
   // 1. BUSCAR TODOS LOS USUARIOS QUE ESTAN CON STATUS TRUE
@@ -85,5 +89,64 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: 'User deleted successfully',
+  });
+});
+
+exports.getOrders = catchAsync(async (req, res, next) => {
+  const { sessionUser } = req;
+
+  const orders = await Order.findAll({
+    where: {
+      userId: sessionUser.id,
+      status: true,
+    },
+    include: [
+      {
+        model: Cart,
+        where: {
+          status: 'purchased',
+        },
+        include: [
+          {
+            model: ProductInCart,
+            where: {
+              status: 'purchased',
+            },
+          },
+        ],
+      },
+    ],
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'get the order',
+    orders,
+  });
+});
+
+exports.getOrderById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const { sessionUser } = req;
+
+  const order = await Order.findOne({
+    where: {
+      userId: sessionUser.id,
+      id,
+      status: true,
+    },
+    include: [
+      {
+        model: Cart,
+        where: { status: 'purchased' },
+        include: [{ model: ProductInCart, where: { status: 'purchased' } }],
+      },
+    ],
+  });
+  res.status(200).json({
+    status: 'success',
+    message: 'get the order',
+    order,
   });
 });

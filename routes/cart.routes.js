@@ -4,6 +4,7 @@ const {
   addProductToCart,
   updateCart,
   removeProductToCart,
+  buyProductOnCart,
 } = require('../controllers/cart.controller');
 const { protect } = require('../middlewares/aut.middleware');
 const {
@@ -60,4 +61,6 @@ router.delete(
   validExitProductInCartByParamsForUpdate,
   removeProductToCart
 );
+
+router.post('/purchase', buyProductOnCart);
 module.exports = { cartRouter: router };

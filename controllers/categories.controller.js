@@ -14,6 +14,8 @@ exports.findCategories = catchAsync(async (req, res, next) => {
         where: {
           status: true,
         },
+        // required para mostrar  todas las categorias sin importar que no tengan productos
+        required: false,
         include: [
           {
             model: User,

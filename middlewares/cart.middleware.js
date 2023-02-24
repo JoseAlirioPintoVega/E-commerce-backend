@@ -22,7 +22,7 @@ exports.validExistCart = catchAsync(async (req, res, next) => {
 });
 exports.ValidExistProductInCart = catchAsync(async (req, res, next) => {
   const { product, cart } = req;
-
+  console.log(product.id, cart.id);
   const productInCart = await ProductInCart.findOne({
     where: {
       cartId: cart.id,
@@ -30,6 +30,7 @@ exports.ValidExistProductInCart = catchAsync(async (req, res, next) => {
     },
   });
 
+  console.log(productInCart, 'me ejecute');
   if (productInCart && productInCart.status === 'removed') {
     await productInCart.update({ status: 'active', quantity: 1 });
     return res.status(200).json({
