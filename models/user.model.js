@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const { db } = require('../dataBase/db');
+const { db } = require('../database/db');
 
 const User = db.define('user', {
   id: {
@@ -28,6 +28,10 @@ const User = db.define('user', {
   },
   passwordChangedAt: {
     type: DataTypes.DATE,
+    allowNull: true,
+  },
+  profileImageUrl: {
+    type: DataTypes.STRING,
     allowNull: true,
   },
   status: {

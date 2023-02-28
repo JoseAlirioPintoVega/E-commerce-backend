@@ -1,4 +1,5 @@
 const Product = require('../models/product.model');
+const ProductImg = require('../models/productImg.model');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -10,6 +11,11 @@ exports.verifyProductById = catchAsync(async (req, res, next) => {
       id,
       status: true,
     },
+    include: [
+      {
+        model: ProductImg,
+      },
+    ],
   });
 
   if (!product) {

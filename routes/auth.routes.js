@@ -8,12 +8,14 @@ const { check } = require('express-validator');
 const { validIfExistUserEmail } = require('../middlewares/user.middlewares');
 const { validateFields } = require('../middlewares/validateField.middleware');
 const { protect } = require('../middlewares/aut.middleware');
+const { upload } = require('../utils/multer');
 
 const router = Router();
 
 router.post(
   '/signup',
   [
+    upload.single('profileImageUrl'),
     check('username', 'The username must be mandatory').not().isEmpty(),
     check('email', 'The email must be mandatory').not().isEmpty(),
     check('email', 'The email has been a correct format').isEmail(),

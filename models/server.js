@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const xss = require('xss-clean');
 
-const { db } = require('../dataBase/db');
+const { db } = require('../database/db');
 const { authRouter } = require('../routes/auth.routes');
 const { categoriesRouter } = require('../routes/categories.routes');
 const { productRouter } = require('../routes/product.routes');
